@@ -5,7 +5,7 @@ const urls = {
 
   // source: https://gist.github.com/mbostock/7608400
   airports:
-    "airport_locations.csv",
+    "https://raw.githubusercontent.com/nordstroem92/davi/master/airport_locations.csv",
 
   // source: https://gist.github.com/mbostock/7608400
   flights:
@@ -68,7 +68,7 @@ function processData(values) {
   let flights  = values[1];
 
   console.log("airports: " + airports.length);
-  console.log(" flights: " + flights.length);
+  console.log("flights: " + flights.length);
 
   // convert airports array (pre filter) into map for fast lookup
   let iata = new Map(airports.map(node => [node.iata, node]));
@@ -83,28 +83,8 @@ function processData(values) {
     link.target.incoming += link.count;
   });
 
-  // remove airports out of bounds
-  let old = airports.length;
-  airports = airports.filter(airport => airport.x >= 0 && airport.y >= 0);
-  console.log(" removed: " + (old - airports.length) + " airports out of bounds");
-
-  // remove airports with NA state
-  old = airports.length;
-  airports = airports.filter(airport => airport.state !== "NA");
-  console.log(" removed: " + (old - airports.length) + " airports with NA state");
-
-  // remove airports without any flights
-  old = airports.length;
-  airports = airports.filter(airport => airport.outgoing > 0 && airport.incoming > 0);
-  console.log(" removed: " + (old - airports.length) + " airports without flights");
-
   // sort airports by outgoing degree
   airports.sort((a, b) => d3.descending(a.outgoing, b.outgoing));
-
-  // keep only the top airports
-  old = airports.length;
-  airports = airports.slice(0, 50);
-  console.log(" removed: " + (old - airports.length) + " airports with low outgoing degree");
 
   // done filtering airports can draw
   drawAirports(airports);
@@ -184,7 +164,7 @@ function drawPolygons(airports) {
       properties: airport,
       geometry: {
         type: "Point",
-        coordinates: [airport.longitude, airport.latitude]
+        coordinates: [airport.longitude_deg, airport.latitude_deg]
       }
     };
   });
